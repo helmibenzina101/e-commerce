@@ -1,76 +1,111 @@
-
-      import axios from 'axios'
-      import { useEffect, useState } from 'react'
-      
-      const Listarticles = () => {
-        const[articles,setArticles]=useState([])
-      
-        const [isLoading, setIsloading] = useState(true);
-
-        const loadarticles=async()=>{
-          try {
-            const res=await axios.get("https://laravel-commerce-9ya4.vercel.app/api/api/articles")
-            setArticles(res.data)
-            setIsloading(false)
-          } catch (error) {
-            console.log(error)
-          }
-        }
-        useEffect(()=>{
-          loadarticles()
-        },[])
-      const handleDelete=async(id)=>{
-        if(window.confirm("êtes vous sure de vouloir supprimer")){
+import React from 'react';
+import axios from 'axios';
+import { Button } from 'react-bootstrap';
+import ReactLoading from 'react-loading';
+import { Link } from 'react-router-dom';
+const Listarticles = () => {
+    const [articles, setArticles] = React.useState([]);
+    const [isLoading, setIsLoading] = React.useState(true);
+    const fetcharticles = async () => {
         try {
-          await axios.delete(`https://laravel-commerce-9ya4.vercel.app/api/api/articles/${id}`)
-          .then(() => {
-            setArticles(articles.filter(art=>art.id!=id))
-          })
+            const response = await axios.get(
+                'https://laravel-commerce-9ya4.vercel.app/api/api/articles',
+            );
+            setArticles(response.data);
+            setIsLoading(true);
         } catch (error) {
-          console.log(error)
+            console.error(error);
+        } finally {
+            setIsLoading(false)
         }
-      }
-      
-      }
-        return (
-          <div>
-            <button className='btn btn-success btn-sm'><i className="fa-solid fa-square-plus"></i> Ajouter</button>
-          <center> <h1> Liste des articles</h1></center>
-            <table className='table table-striped'>
-              <thead>
-                <tr>
-                  <th>Référence</th>
-                  <th>Désignation</th>
-                  <th>Marque</th>
-                  <th>Stock</th>
-                  <th>Prix</th>
-                  <th>Image</th>
-                  <th>Sous catégorie</th>
-                  <th>Update</th>
-                  <th>Delete</th>
-                </tr>
-              </thead>
-              <tbody>
-              {
-                articles.map((art,index)=>
-                  <tr key={index}>
-                    <td>{art.reference}</td>
-                    <td>{art.designation}</td>
-                    <td>{art.marque}</td>
-                    <td>{art.qtestock}</td>
-                    <td>{art.prix}</td>
-                    <td><img src={art.imageart} width={100} height={100}/></td>
-                    <td>{art.scategorieID}</td>
-                    <td><button className='btn btn-warning btn-sm'><i className="fa-solid fa-pen-to-square"></i> Update</button></td>
-                    <td><button className='btn btn-danger btn-sm' onClick={()=>handleDelete(art.id)}><i className="fa-solid fa-trash"></i> Delete</button></td>
+    };
+    React.useEffect(() => {
+        fetcharticles();
+    }, [articles]);
+
+    const handleDelete = async (id) => {
+        try {
+            const res = await axios.delete("https://laravel-commerce-9ya4.vercel.app/api/api/articles/${id}")
+            setArticles(articles.filter(art => art.id != id))
+            console.info(res.data)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    return (
+        <div>
+            <Link to='/articles/add'>
+                <Button
+                    size='sm'
+                    variant='success'>
+                    <i className='fa-solid fa-square-plus'></i> Ajouter
+                </Button>
+            </Link>
+            <h1>Liste des articles</h1>
+            <table className='table table-striped table-bordered table-hover'>
+                <thead>
+                    <tr>
+                        <th>Référence</th>
+                        <th>Désignation</th>
+                        <th>Marque</th>
+                        <th>Prix</th>
+                        <th>Stock</th>
+                        <th>Image</th>
+                        <th>Update</th>
+                        <th>Delete</th>
                     </tr>
-                
-                )
-              }
-              </tbody>
+                </thead>
+                <tbody className='container'>
+                    {isLoading ? (
+                        <center>
+                            <ReactLoading
+                                className='col-md-auto'
+                                type='spin'
+                                color='blue'
+                                width={'100%'}
+                            />
+                        </center>
+                    ) : (
+                        articles.map((article) => (
+                            <tr key={article.id}>
+                                <td>{article.reference}</td>
+                                <td>{article.designation}</td>
+                                <td>{article.marque}</td>
+                                <td>{article.prix}</td>
+                                <td>{article.qtestock}</td>
+                                <td>
+                                    <img
+                                        width={70}
+                                        alt={article.designation}
+                                        src={article.imageart}
+                                    />
+                                </td>
+                                <td>
+                                    <Link to={`/articles/edit/${article.id}`}>
+                                        <Button
+                                            size='sm'
+                                            variant='warning'>
+                                            <i className='fa-solid fa-pen-to-square'></i> Update
+                                        </Button>
+                                    </Link>
+                                </td>
+                                <td>
+                                    <Button
+                                        disabled={isLoading}
+                                        onClick={() => handleDelete(article.id)}
+                                        size='sm'
+                                        variant='danger'>
+                                        <i className='fa-solid fa-trash-can'></i> Delete
+                                    </Button>
+                                </td>
+                            </tr>
+                        ))
+                    )}
+                </tbody>
             </table>
-          </div>
-        )
-      }
-      
-      export default Listarticles
+        </div>
+    );
+};
+
+export default Listarticles;

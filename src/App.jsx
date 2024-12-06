@@ -16,6 +16,7 @@ import Editcategorie from "./componants/categories/Editcategorie";
 import Editscategorie from "./componants/scategories/Editscategorie";
 import Viewscategorie from "./componants/scategories/Viewscategorie";
 import Listearticlescard from "./componants/Client/Listearticlecard";
+
 const App=() =>{
 return (
   <div>
@@ -36,6 +37,7 @@ return (
         <Route path="/scategories/edit/:id" element={<Editscategorie/>}/>
         <Route path="/scategories/view/:id" element={<Viewscategorie/>}/>
         <Route path="/client" element={<Listearticlescard/>}/>
+        <Route path="/articlescard" element={<Listearticlescard/>}/>
       </Routes>
     </Router>
   </div>
